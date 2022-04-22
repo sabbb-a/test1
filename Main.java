@@ -6,9 +6,14 @@
 package javaapplication45;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
-import static javaapplication45.SongInfo.getTitle;
+import java.util.Scanner;
+import static javaapplication45.SongInfo.infoURLBuilder;
+
+
 
 /**
  *
@@ -16,8 +21,10 @@ import static javaapplication45.SongInfo.getTitle;
  */
 public class Main {
     public static void main(String[] args) throws Exception {
-        
-        System.out.println(LyricsFinder.readableLyrics("chantaje"));
 
+         String[] idk = SongFinder.matches("I'm about to drop out");
+         for(String i: idk)
+             if (!(i==null))
+             System.out.println(i);
     }
 }
