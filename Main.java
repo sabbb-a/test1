@@ -16,18 +16,8 @@ import static javaapplication45.SongInfo.getTitle;
  */
 public class Main {
     public static void main(String[] args) throws Exception {
-        URL info = new URL(LyricsFinder.infoURLBuilder("ciel noir"));
-        BufferedReader in = new BufferedReader(
-        new InputStreamReader(info.openStream()));
-        String inputLine = in.readLine();
         
-
-        URL search = new URL(LyricsFinder.lyricsURLBuilder(SongInfo.getArtist(inputLine), LyricsFinder.TitleNoSpace(SongInfo.getTitle(inputLine))));
-        BufferedReader in1 = new BufferedReader(
-        new InputStreamReader(search.openStream()));
-        String rawLyrics = in1.readLine();
-        System.out.println(LyricsFinder.readableLyrics(rawLyrics));
-
+        System.out.println(LyricsFinder.readableLyrics("chantaje"));
 
     }
 }
