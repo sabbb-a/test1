@@ -21,10 +21,15 @@ import static javaapplication45.SongInfo.infoURLBuilder;
  */
 public class Main {
     public static void main(String[] args) throws Exception {
-
-         String[] idk = SongFinder.matches("I'm about to drop out");
-         for(String i: idk)
+        //finding songs with lyrics
+        String[] idk = SongFinder.matches("I'm about to drop out");
+        for(String i: idk)
              if (!(i==null))
              System.out.println(i);
+        
+        System.out.println("------");
+        
+        //finding lyrics with title
+        System.out.println(LyricsFinder.readableLyrics("purple rain"));
     }
 }
