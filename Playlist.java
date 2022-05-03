@@ -45,12 +45,12 @@ public class Playlist {
         bout.close();
 
     }
-
+/*
     public static void main(String[] args) throws Exception {
         Playlist pl = new Playlist("test");
         pl.savePlaylist();
         pl.loadPlaylist();
 
     }
-
+*/
 }
