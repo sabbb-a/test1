@@ -8,20 +8,27 @@ public class Playlist {
     LinkedHashSet<Song> playlist = new LinkedHashSet<>();
     String title;
 
-    public Playlist(String title) {
+    public Playlist(String title) throws Exception {
         this.title = title;
+        //this.savePlaylist(); NEED TO FIND A WAY TO CIRCUMVENT THIS
+        //see UIM lines 124 and 136
+        //
+        //AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
+        //
+        //
     }
-    
-    public void add(String songTitle){
+
+    public void add(String songTitle) {
         this.playlist.add(new Song(songTitle));
+
     }
-    
-    public void remove(String songTitle){
-        
+
+    public void remove(String songTitle) {
+
     }
-    
-    public void delete(String title){
-        
+
+    public void delete(String title) {
+
     }
 
     public void loadPlaylist() throws IOException {
@@ -39,18 +46,16 @@ public class Playlist {
 
         FileWriter fout = new FileWriter("Playlists/" + this.title + ".txt");
         BufferedWriter bout = new BufferedWriter(fout);
-        
-        String s = "\nsome random string";
         bout.write(this.playlist.toString());
         bout.close();
 
     }
-/*
+    /*
     public static void main(String[] args) throws Exception {
         Playlist pl = new Playlist("test");
         pl.savePlaylist();
         pl.loadPlaylist();
 
     }
-*/
+     */
 }
