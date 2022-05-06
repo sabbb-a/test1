@@ -1,6 +1,8 @@
 package javaapplication45;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Scanner;
 
 /**
@@ -69,13 +71,13 @@ public class UserInputManager {
                             String lyrics = Finder.readableLyrics(getInput());
                             System.out.println("-------Displaying Lyrics------\n\n" + lyrics);
                             break;
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             System.err.println("Please try again.");
-                            System.err.println(e);
                             continue;
                         }
                         //method for searching lyrics, with parameter getInput() to retrieve title
                     }
+                    break;
                 case "2":
                     while (true) {
                         System.out.println(">Searching for song info. Please input a snippet of the desired song's lyrics:");
@@ -88,9 +90,8 @@ public class UserInputManager {
                                 }
                             }
                             break;
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             System.err.println("Please try again.");
-                            System.err.println(e);
                             continue;
                         }
 
@@ -115,6 +116,7 @@ public class UserInputManager {
                     + "Please enter your choice.\n"
                     + "[1] Create a new playlist\n"
                     + "[2] Access an existing playlist\n"
+                    + "[3] Display existing playlists\n"
                     + "[0] Cancel\n"
                     + "Choice: ");
             userInput = getInput();
@@ -124,6 +126,10 @@ public class UserInputManager {
                     break;
                 case "2":
                     playlistAccessMenu();
+                    break;
+                case "3":
+                    System.out.println("Displaying names of all existing playlists.\n"
+                            + Playlist.plTitles);
                     break;
                 case "0":
                     System.out.println("Cancelling.");
@@ -135,22 +141,33 @@ public class UserInputManager {
     }
 
     private static void playlistCreationMenu() throws Exception {
-        System.out.println(">Creating a new playlist. Please enter a playlist title. Enter 0 to cancel.");
-        String title = getInput();
-        if (!title.equals("0")) {
-            Playlist pl = new Playlist(title);
-            //constructor for Playlist, using title variable as parameter.
-            System.out.println("Playlist \"" + title + "\" created.");
-        } else {
-            System.out.println("Cancelling.");
-        }
+        String title;
+        do {
+            System.out.println(">Creating a new playlist. Please enter a playlist title. Enter 0 to cancel.");
+            title = getInput();
+            if (title.equals("0")) {
+                System.out.println("Cancelling.");
+            } else if (Playlist.plTitles.stream().anyMatch(title::equalsIgnoreCase)) {
+                System.out.println("Playlist \"" + title + "\" already exists! Please try again.");
+            } else {
+                File plfile = new File("Playlists/" + title + ".txt");
+                //constructor for Playlist, using title variable as parameter.
+                plfile.createNewFile();
+                System.out.println("Playlist \"" + title + "\" created.");
+
+                break;
+            }
+        } while (!title.equals("0"));
     }
 
     private static void playlistAccessMenu() throws Exception {
         System.out.println(">Please enter the desired playlist's title. Enter 0 to cancel.");
         String title = getInput();
-        if (!title.equals("0")) {
+        if (title.equals("0")) {
+            System.out.println("Cancelling.");
+        } else {
             Playlist currentPlaylist = new Playlist(title);
+            currentPlaylist.loadPlaylist();
             do {
                 System.out.println("Playlist \"" + title + "\" selected.");
 
@@ -158,7 +175,7 @@ public class UserInputManager {
                         + "[1] View songs in playlist\n"
                         + "[2] Add a song to the playlist\n"
                         + "[3] Remove a song from the playlist\n"
-                        + "[4] Filter playlist\n"
+                        + "[4] Sort playlist\n"
                         + "[5] Delete playlist\n"
                         + "[0] Cancel\n"
                         + "Choice: ");
@@ -166,15 +183,20 @@ public class UserInputManager {
                 switch (userInput) {
                     case "1":
                         System.out.println("Displaying playlist.");
-                        currentPlaylist.loadPlaylist();
+                        currentPlaylist.displayPlaylist();
                         break;
                     case "2":
                         System.out.println("Adding a song.\n");
                         while (true) {
-                            System.out.println("What is the title of the song you wish to add?");
+                            System.out.println("What is the title/query for the song you wish to add?");
                             try {
-                                currentPlaylist.add(Song.retrieveTitle(getInput()));
-                                break;
+                                Song selectedSong = new Song(Song.retrieveTitle(getInput()));
+                                if (currentPlaylist.add(selectedSong)) {
+                                    System.out.println("Song \"" + selectedSong.toString() + "\" successfully added.");
+                                    break;
+                                }
+                                System.out.println("Song already exists in this playlist. Please try again.");
+                                continue;
                             } catch (IOException e) {
                                 System.out.println("We could not find that song, please try again.");
                                 continue;
@@ -184,16 +206,49 @@ public class UserInputManager {
                         break;
 
                     case "3":
-
+                        //NOTE----------------------
+                        //this could be made faster. Removing the song does not require to look up api,
+                        //but if we want to give the possibility of removing a specific song, this helps with it.
+                        System.out.println("Removing a song.\n");
+                        while (true) {
+                            System.out.println("What is the title/query for the song you wish to remove?");
+                            try {
+                                Song selectedSong = new Song(Song.retrieveTitle(getInput()));
+                                if (currentPlaylist.remove(selectedSong)) {
+                                    System.out.println("Song \"" + selectedSong.toString() + "\" successfully removed.");
+                                    break;
+                                }
+                                System.out.println("Song does not exist in this playlist (perhaps try to be more specific?). Please try again.");
+                                continue;
+                            } catch (IOException e) {
+                                System.out.println("We could not find that song, please try again.");
+                                continue;
+                            }
+                        }
+                        currentPlaylist.savePlaylist();
                         break;
 
                     case "4":
-
+                        playlistSortMenu(currentPlaylist);
                         break;
 
                     case "5":
-
+                        System.out.println("Are you sure you wish to delete this playlist: " + currentPlaylist.getTitle() + "\n"
+                                + "[Y] Yes\n"
+                                + "[N] No");
+                        String input = getInput();
+                        if (input.equalsIgnoreCase("y")) {
+                            File plfile = new File("Playlists/" + currentPlaylist.getTitle() + ".txt");
+                            //constructor for Playlist, using title variable as parameter.
+                            plfile.delete();
+                            System.out.println("Playlist \"" + currentPlaylist.getTitle() + "\" deleted.");
+                        } else if (input.equalsIgnoreCase("n")){
+                            System.out.println("Cancelling.");
+                        } else {
+                            System.out.println("Invalid input.");
+                        }
                         break;
+                        
                     case "0":
                         System.out.println("Cancelling.");
                         break;
@@ -202,10 +257,41 @@ public class UserInputManager {
                 }
 
             } while (!userInput.equals("0"));
-
-        } else {
-            System.out.println("Cancelling.");
         }
+    }
+
+    private static void playlistSortMenu(Playlist cpl) throws Exception {
+        String input;
+        do {
+            System.out.println(">Sorting selected playlist. How would you like to sort the playlist?\n"
+                    + "[1] Sort by title\n"
+                    + "[2] Sort by artist\n"
+                    + "[3] Sort by release date\n"
+                    + "[0] Cancel");
+
+            input = getInput();
+            switch (input) {
+                case "1":
+                    System.out.println("Sorted by title.");
+                    cpl.getPlaylist().stream().sorted(Song.TitleComparator);
+                    break;
+                case "2":
+                    System.out.println("Sorted by artist.");
+                    cpl.getPlaylist().stream().sorted(Song.ArtistComparator);
+                    break;
+                case "3":
+                    System.out.println("Sorted by release date.");
+                    cpl.getPlaylist().stream().sorted(Song.DateComparator);
+                    break;
+                case "0":
+                    break;
+                default:
+                    System.out.println("Invalid input, please try again.");
+                    break;
+            }
+        } while (!input.equals("0"));
+
+        cpl.savePlaylist();
     }
 
 //====================

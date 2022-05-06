@@ -1,35 +1,26 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package javaapplication45;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Scanner;
-import static javaapplication45.SongInfo.infoURLBuilder;
-
-
+import java.util.*;
 
 /**
- *
- * @author sabri
+ * @author stellarium
  */
 public class Main {
+
     public static void main(String[] args) throws Exception {
-        //finding songs with lyrics
-        String[] idk = SongFinder.matches("I'm about to drop out");
-        for(String i: idk)
-             if (!(i==null))
-             System.out.println(i);
         
-        System.out.println("------");
+        //loading playlists titles
+        ArrayList<String> temporary = new ArrayList<String>(Arrays.asList(Playlist.folder.list()));
+        for (int i = 0; i < temporary.size(); i++) {
+            String str = temporary.get(i);
+            temporary.set(i, str.substring(0, str.length()-4));
+        }
+        Playlist.plTitles = temporary;
+        System.out.println(Playlist.plTitles);
         
-        //finding lyrics with title
-        System.out.println(LyricsFinder.readableLyrics("purple rain"));
+        
+        
+        UserInputManager.mainMenu();
+
     }
 }
