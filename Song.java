@@ -6,6 +6,7 @@ package javaapplication45;
  */
 import java.net.*;
 import java.io.*;
+import java.text.DateFormat;
 import java.util.*;
 
 public class Song {
@@ -13,7 +14,11 @@ public class Song {
     private static final String INFOURL = "https://genius.com/api/search/song?q=";
     private String lyrics, artist, title;
     private Date date;
+    private static final DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.CANADA);
 
+    public static String formatDate(Date date) {
+        return df.format(date);
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -34,17 +39,30 @@ public class Song {
         this.date = date;
     }
 
-    public Song(String title) {
-        this.title = title;
+    //OLD SONG CONSTRUCTOR, NEW ONE OPTIMIZES #of times URL is opened (reducing processing time)
+    /* public Song(String title) throws IOException {
+        this.title = Song.retrieveTitle(title);
         try {
             this.lyrics = Finder.readableLyrics(this.title);
-            this.artist = retrieveArtist(this.title);
-            //this.date = retrieveDate(this.title);
-            //MUST CIRCUMVENT THE API HAVING A \n IN THE TEXT SOMEHOW!
-            //===========================!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         } catch (IOException ex) {
-            System.out.println("An error has occured.");
+            System.out.println("Lyrics for this song could not be found. Continuing.");
+            System.out.println(ex);
+        } finally {
+            this.artist = retrieveArtist(title);
+            this.date = retrieveDate(title);
         }
+    }
+     */
+    //new constructor! LITERALLY SPEEDS UP PROCESS OF ADDING/REMOVING BY 3X
+    public Song(String title) throws IOException {
+        String fullText = infoReading(title);
+        this.title = fullText.substring((fullText.indexOf("\"title\":\"") + 9), fullText.indexOf("\",\"title_with"));
+        String tempArtist = fullText.substring((fullText.indexOf("names\":\"") + 8), fullText.indexOf("\",\"full"));
+        if (tempArtist.contains(" (Ft. ")) {
+            tempArtist = tempArtist.substring(0, tempArtist.indexOf(" (Ft. "));
+        }
+        this.artist = tempArtist;
+        this.date = new Date(fullText = fullText.substring((fullText.indexOf(("\"release_date_for_display\":\"")) + 28), fullText.indexOf("\",\"song_art_image_thumbnail_url")));
     }
 
     public static String infoURLBuilder(String title) {
@@ -78,6 +96,12 @@ public class Song {
         return this.date;
     }
 
+    //BELOW FUNCTIONS RETIRED
+    //they were suboptimal in terms of speed/time complexity
+    //previously, these were used to look for information online
+    //retired because the functions they were used for did not need
+    //for a URL to be opened 3 times, only once.
+    /*
     public static String retrieveArtist(String title) throws IOException {
         String input = infoReading(title);
         input = input.substring((input.indexOf("names\":\"") + 8), input.indexOf("\",\"full"));
@@ -92,20 +116,14 @@ public class Song {
         input = input.substring((input.indexOf("\"title\":\"") + 9), input.indexOf("\",\"title_with"));
         return input;
     }
-//unused????
 
-    /*  public static String retrieveApiPath(String title) throws IOException {
-        String input = infoReading(title);
-        input = input.substring((input.indexOf("path\":\"/songs/") + 14), input.indexOf("\",\"artist_names"));
-        return input;
-    }
-     */
     public static Date retrieveDate(String title) throws IOException {
         String input = infoReading(title);
-        input = input.substring((input.indexOf(("\"release_date_for_display\":\"") + 27, input.indexOf("\",\"song_art_image_thumbnail_url"))));
+        input = input.substring((input.indexOf(("\"release_date_for_display\":\"")) + 28), input.indexOf("\",\"song_art_image_thumbnail_url"));
+        System.out.println(input);
         return new Date(input);
     }
-
+     */
     @Override
     public String toString() {
         return (this.artist + " - " + this.title);

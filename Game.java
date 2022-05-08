@@ -20,7 +20,7 @@ public class Game {
         int score  = 0;
         int level = 1;
         System.out.println("At any time, press e to exit the game.");
-        for (Level i:Level.levelsList){
+        gameLoop : for (Level i:Level.levelsList){
             
             System.out.println("Level " + level);
             System.out.println(i.getChorus());
@@ -35,7 +35,7 @@ public class Game {
             }
             else if(guess.equals("e")){
                 System.out.println("Exiting the game...");
-                UserInputManager.mainMenu();
+                break gameLoop;
             }
             else{
                 System.out.println("Wrong... The answer was " + i.getArtist());
@@ -56,7 +56,7 @@ public class Game {
         int level = 1;
         System.out.println("At any time, press 0 to exit the game.");
         try{
-        for (Level i:Level.levelsList){
+            gameLoop : for (Level i:Level.levelsList){
             
             System.out.println("Level " + level);
             System.out.println(i.getChorus());
@@ -69,7 +69,7 @@ public class Game {
             }
             else if(guess.equals("e")){
                 System.out.println("Exiting the game...");
-                UserInputManager.mainMenu();
+                break gameLoop;
             }
             else{
                 System.out.println("Wrong... The answer was " + i.getTitle());

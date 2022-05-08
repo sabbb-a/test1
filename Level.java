@@ -30,7 +30,7 @@ public class Level {
     
     
     public String getTitle() {
-        return title;
+        return this.title;
     }
 
     public void setTitle(String title) {
@@ -38,7 +38,7 @@ public class Level {
     }
 
     public String getArtist() {
-        return artist;
+        return this.artist;
     }
 
     public void setArtist(String artist) {
@@ -46,7 +46,7 @@ public class Level {
     }
 
     public String getChorus() {
-        return chorus;
+        return this.chorus;
     }
 
     public void setChorus(String chorus) {
@@ -100,4 +100,3 @@ public class Level {
     }
     
     
-

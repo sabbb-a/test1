@@ -20,7 +20,21 @@ public class Finder {
     }
 
     public static String lyricsURLBuilder(String title) throws IOException {
-        return (LYRICSURL + removeSpaces(Song.retrieveArtist(title)) + "/" + removeSpaces(Song.retrieveTitle(title)));
+        String fullText = Song.infoReading(title);
+        String URLTitle = removeSpaces(fullText.substring((fullText.indexOf("\"title\":\"") + 9), fullText.indexOf("\",\"title_with")));
+        String tempArtist = fullText.substring((fullText.indexOf("names\":\"") + 8), fullText.indexOf("\",\"full"));
+        if (tempArtist.contains(" (Ft. ")) {
+            tempArtist = tempArtist.substring(0, tempArtist.indexOf(" (Ft. "));
+        }
+        String URLArtist = removeSpaces(tempArtist);
+        return (LYRICSURL + URLArtist + "/" + URLTitle);
+
+//RETIRED PIECE OF CODE, OPTIMIZED TO 3X SPEED (idk the actual math) (opening URL less times) (like Song Constructor)        
+//return (LYRICSURL + removeSpaces(Song.retrieveArtist(title)) + "/" + removeSpaces(Song.retrieveTitle(title)));
+    }
+
+    public static void main(String[] args) throws IOException {
+        System.out.println(readableLyrics("hey jude"));
     }
 
     private static String songURLBuilder(String snippet) {

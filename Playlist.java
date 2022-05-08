@@ -24,7 +24,7 @@ public class Playlist {
     }
 
     public boolean remove(Song song) {
-        return (this.playlist.add(song));
+        return (this.playlist.remove(song));
     }
 
     public void delete(String title) {
@@ -34,8 +34,12 @@ public class Playlist {
 
     public void displayPlaylist() throws IOException {
 
-        DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.CANADA);
-        System.out.println(this.playlist);
+        if (this.playlist.isEmpty()) {
+            System.out.println("Playlist \"" + this.title + "\" is empty!\n");
+        } else {
+            this.playlist.forEach(System.out::println);
+            
+        }
     }
 
     public void loadPlaylist() throws IOException {
@@ -45,7 +49,12 @@ public class Playlist {
         FileReader fin = new FileReader("Playlists/" + this.title + ".txt");
         BufferedReader bin = new BufferedReader(fin);
         while ((line = bin.readLine()) != null) {
-            System.out.println(line);
+
+            artist = line.substring(9, line.indexOf("\"}, title:"));
+            title = line.substring((line.indexOf("title:{\"")) + 8, line.indexOf("\"}, date:"));
+            date = new Date((line.substring((line.indexOf("date:{\"")) + 7, line.length() - 2)).replace(".", ""));
+            this.playlist.add(new Song(artist, title, date));
+
         }
 
         bin.close();
@@ -66,13 +75,19 @@ public class Playlist {
     private LinkedList<String> infoToWrite(LinkedHashSet<Song> pl) {
         LinkedList<String> lines = new LinkedList<String>();
         for (Song s : pl) {
-            lines.add("artist:{\"" + s.getArtist() + "\"}, title:{\"" + s.getTitle() + "\"}, date:{\"" + s.getDate() + "\"}");
+            lines.add("artist:{\"" + s.getArtist() + "\"}, title:{\"" + s.getTitle() + "\"}, date:{\"" + Song.formatDate(s.getDate()) + "\"}\n");
         }
         return lines;
     }
 
     public LinkedHashSet<Song> getPlaylist() {
         return this.playlist;
+    }
+
+    public void sort(Comparator<Song> comparator) {
+        List<Song> list = new ArrayList<Song>(this.playlist);
+        Collections.sort(list, comparator);
+        this.playlist = new LinkedHashSet<Song>(list);
     }
 
     public void setPlaylist(LinkedHashSet<Song> playlist) {

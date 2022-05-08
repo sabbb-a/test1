@@ -2,7 +2,6 @@ package javaapplication45;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Scanner;
 
 /**
@@ -168,6 +167,7 @@ public class UserInputManager {
         } else {
             Playlist currentPlaylist = new Playlist(title);
             currentPlaylist.loadPlaylist();
+            outerLoop:
             do {
                 System.out.println("Playlist \"" + title + "\" selected.");
 
@@ -188,9 +188,14 @@ public class UserInputManager {
                     case "2":
                         System.out.println("Adding a song.\n");
                         while (true) {
-                            System.out.println("What is the title/query for the song you wish to add?");
+                            System.out.println("What is the title/query for the song you wish to add? Enter \"0\" to cancel.");
                             try {
-                                Song selectedSong = new Song(Song.retrieveTitle(getInput()));
+                                String input = getInput();
+                                if (input.equals("0")) {
+                                    System.out.println("Cancelling.");
+                                    break;
+                                }
+                                Song selectedSong = new Song(input);
                                 if (currentPlaylist.add(selectedSong)) {
                                     System.out.println("Song \"" + selectedSong.toString() + "\" successfully added.");
                                     break;
@@ -211,9 +216,15 @@ public class UserInputManager {
                         //but if we want to give the possibility of removing a specific song, this helps with it.
                         System.out.println("Removing a song.\n");
                         while (true) {
-                            System.out.println("What is the title/query for the song you wish to remove?");
+                            System.out.println("What is the title/query for the song you wish to remove? Enter \"0\" to cancel.");
                             try {
-                                Song selectedSong = new Song(Song.retrieveTitle(getInput()));
+                                String input = getInput();
+                                if (input.equals("0")) {
+                                    System.out.println("Cancelling.");
+                                    break;
+                                }
+                                Song selectedSong = new Song(input);
+
                                 if (currentPlaylist.remove(selectedSong)) {
                                     System.out.println("Song \"" + selectedSong.toString() + "\" successfully removed.");
                                     break;
@@ -239,16 +250,16 @@ public class UserInputManager {
                         String input = getInput();
                         if (input.equalsIgnoreCase("y")) {
                             File plfile = new File("Playlists/" + currentPlaylist.getTitle() + ".txt");
-                            //constructor for Playlist, using title variable as parameter.
                             plfile.delete();
                             System.out.println("Playlist \"" + currentPlaylist.getTitle() + "\" deleted.");
-                        } else if (input.equalsIgnoreCase("n")){
+                            break outerLoop;
+                        } else if (input.equalsIgnoreCase("n")) {
                             System.out.println("Cancelling.");
                         } else {
                             System.out.println("Invalid input.");
                         }
                         break;
-                        
+
                     case "0":
                         System.out.println("Cancelling.");
                         break;
@@ -273,15 +284,18 @@ public class UserInputManager {
             switch (input) {
                 case "1":
                     System.out.println("Sorted by title.");
-                    cpl.getPlaylist().stream().sorted(Song.TitleComparator);
+                    cpl.sort(Song.TitleComparator);
+                    cpl.savePlaylist();
                     break;
                 case "2":
                     System.out.println("Sorted by artist.");
-                    cpl.getPlaylist().stream().sorted(Song.ArtistComparator);
+                    cpl.sort(Song.ArtistComparator);
+                    cpl.savePlaylist();
                     break;
                 case "3":
                     System.out.println("Sorted by release date.");
-                    cpl.getPlaylist().stream().sorted(Song.DateComparator);
+                    cpl.sort(Song.DateComparator);
+                    cpl.savePlaylist();
                     break;
                 case "0":
                     break;
