@@ -19,25 +19,34 @@ public class Game {
         String guess;
         int score  = 0;
         int level = 1;
-        try{
+        System.out.println("At any time, press e to exit the game.");
         for (Level i:Level.levelsList){
             
             System.out.println("Level " + level);
             System.out.println(i.getChorus());
             System.out.println("Enter your guess: ");
-            guess = sc.nextLine();
+            try{
+                guess = sc.nextLine();
+            
             if (guess.equalsIgnoreCase(i.getArtist())){
                 score ++;
                 System.out.println("Correct! +1 point");
                 level++;
             }
+            else if(guess.equals("e")){
+                System.out.println("Exiting the game...");
+                UserInputManager.mainMenu();
+            }
             else{
                 System.out.println("Wrong... The answer was " + i.getArtist());
                 level++;
             }
+            }catch(Exception e){
+                System.err.println("Invalid guess, try again: ");
+                continue;
+            }
         }
-        }catch(InputMismatchException e){}
-        System.out.println("Final score: " + score + "/25");
+        System.out.println("Final score: " + score + "/10");
     }
     public static void gameTitle (){
             Scanner sc = new Scanner(System.in);
@@ -45,6 +54,7 @@ public class Game {
         String guess;
         int score  = 0;
         int level = 1;
+        System.out.println("At any time, press 0 to exit the game.");
         try{
         for (Level i:Level.levelsList){
             
@@ -57,12 +67,16 @@ public class Game {
                 System.out.println("Correct! +1 point");
                 level++;
             }
+            else if(guess.equals("e")){
+                System.out.println("Exiting the game...");
+                UserInputManager.mainMenu();
+            }
             else{
                 System.out.println("Wrong... The answer was " + i.getTitle());
                 level++;
             }
         }
-        }catch(InputMismatchException e){}
-        System.out.println("Final score: " + score + "/25");
+        }catch(Exception e){}
+        System.out.println("Final score: " + score + "/10");
     }
 }
